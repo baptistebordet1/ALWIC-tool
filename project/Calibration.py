@@ -102,7 +102,7 @@ def normalisation_curve_calc(iso_type,true_vector,measured_vector):
 
 # Function that calculate the final values (after memory correction and normalisation)
 
-def final_value_calculation(corrected_file_df,iso_type,slope,intercept):
+def final_value_calculation(corrected_file_df,iso_type,slope,intercept, MCs,protocol_type):
     """
     Calibrate all the data file
 
@@ -124,10 +124,18 @@ def final_value_calculation(corrected_file_df,iso_type,slope,intercept):
 
     """
     final_value_file_df=corrected_file_df
+    print(slope, intercept)
     final_value_file_df["final_value_"+iso_type]=corrected_file_df["MC_corr"+iso_type]*slope+intercept
+    print(final_value_file_df["MC_corr"+iso_type].iloc[15:60])
+    print(final_value_file_df["final_value_"+iso_type].iloc[15:60])
     for i in range(0,len(final_value_file_df)):
-        if final_value_file_df.loc[i,"MC_corr"+iso_type]==final_value_file_df.loc[i,"raw_value_"+iso_type]:
-            final_value_file_df.loc[i,"final_value_"+iso_type]=final_value_file_df.loc[i,"raw_value_"+iso_type]
+        if protocol_type==0 or protocol_type==1:
+            if final_value_file_df.loc[i,"MC_corr"+iso_type]==final_value_file_df.loc[i,"raw_value_"+iso_type] and MCs[iso_type][final_value_file_df.loc[i,"Inj Nr"]-1]!=1:
+                final_value_file_df.loc[i,"final_value_"+iso_type]=final_value_file_df.loc[i,"raw_value_"+iso_type]
+        else:
+            if final_value_file_df.loc[i,"MC_corr"+iso_type]==final_value_file_df.loc[i,"raw_value_"+iso_type]:
+                final_value_file_df.loc[i,"final_value_"+iso_type]=final_value_file_df.loc[i,"raw_value_"+iso_type]
+
     return final_value_file_df   
 
 # Function to calculate the deuterieum excess on the calibrated values 
@@ -228,7 +236,7 @@ def calibration_vectors_values(measured_vector, true_vector, calibration_vectors
 
 # Function to wrap all the calibration 
 
-def wrapper_calibration(corrected_file_df,iso_type_list,std_idx_norm,std_values,inj_per_std,result_file_df,removed_inj_per_std,std_nbr,protocol_type):
+def wrapper_calibration(corrected_file_df,iso_type_list,std_idx_norm,std_values,inj_per_std,result_file_df,removed_inj_per_std,std_nbr,protocol_type,MCs):
     """
     Wrapper for the calibration
 
@@ -247,8 +255,9 @@ def wrapper_calibration(corrected_file_df,iso_type_list,std_idx_norm,std_values,
     result_file_df : pandas.DataFrame
         DataFrame from the input file
     removed_inj_per_std : int
-        Removed injection per standard    
-     
+        Removed injection per standard 
+    MCs: list
+        Memory Coefficients values.   
     Returns
     -------
     final_value_file_df : pandas.DataFrame
@@ -269,7 +278,7 @@ def wrapper_calibration(corrected_file_df,iso_type_list,std_idx_norm,std_values,
         if protocol_type==2 or protocol_type==3:
             true_vector,measured_vector=create_normalisation_vector_groning(iso_type, std_idx_norm, std_values, inj_per_std, result_file_df, removed_inj_per_std, k)
         slope,intercept=normalisation_curve_calc(iso_type, true_vector, measured_vector)
-        final_value_file_df=final_value_calculation(corrected_file_df, iso_type, slope, intercept)
+        final_value_file_df=final_value_calculation(corrected_file_df, iso_type, slope, intercept,MCs,protocol_type)
         calibration_param_list=calibration_curve_values(slope, intercept, calibration_param_list)
         calibration_vectors=calibration_vectors_values(measured_vector, true_vector, calibration_vectors)
     final_value_file_df=d_excess_calc(final_value_file_df)
