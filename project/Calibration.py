@@ -124,10 +124,7 @@ def final_value_calculation(corrected_file_df,iso_type,slope,intercept, MCs,prot
 
     """
     final_value_file_df=corrected_file_df
-    print(slope, intercept)
     final_value_file_df["final_value_"+iso_type]=corrected_file_df["MC_corr"+iso_type]*slope+intercept
-    print(final_value_file_df["MC_corr"+iso_type].iloc[15:60])
-    print(final_value_file_df["final_value_"+iso_type].iloc[15:60])
     for i in range(0,len(final_value_file_df)):
         if protocol_type==0 or protocol_type==1:
             if final_value_file_df.loc[i,"MC_corr"+iso_type]==final_value_file_df.loc[i,"raw_value_"+iso_type] and MCs[iso_type][final_value_file_df.loc[i,"Inj Nr"]-1]!=1:
