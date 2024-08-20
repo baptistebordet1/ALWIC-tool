@@ -8,9 +8,9 @@ dependencies:
   - pandas 
   - matplotlib 
   - scipy
-  - conda-forge::python-calamine
   - pip
   - pip: 
+    - python-calamine
     - google-api-python-client
     - google-auth-httplib2
     - google-auth-oauthlib
