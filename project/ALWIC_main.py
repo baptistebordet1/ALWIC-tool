@@ -242,7 +242,8 @@ class Main_Window():
         
         # check if the first standard is use for calibration if yes quit 
         
-        if 1 in tuple(map(int, self.config_dict["default_std_calibration"].split(','))):
+        if self.config_dict["default_std_calibration"]!="" and 1 in tuple(map(int, self.config_dict["default_std_calibration"].split(','))):
+            print(1)
             tk.messagebox.showerror("Error","The first standard is used as a default \n standard in the the calibration file. \n CALWIC will quit so you can modify it ! ")
             self.master_window.destroy()
             return
