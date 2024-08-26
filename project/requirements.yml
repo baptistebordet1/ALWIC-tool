@@ -3,7 +3,7 @@ channels:
   - defaults 
   - conda-forge
 dependencies:
-  - spyder
+  - spyder==5.4.3
   - numpy 
   - pandas 
   - matplotlib 
